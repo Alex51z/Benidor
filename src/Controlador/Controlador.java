@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.swing.DefaultListModel;
+
 import Modelo.Cantante;
 import Modelo.Comunidad;
 import Modelo.Ganador_Comunidad;
@@ -37,8 +39,11 @@ public class Controlador implements ActionListener{
 	List<Ganador_Nacional> nacional= new ArrayList<Ganador_Nacional>();
 	List<Ganador_Rangos> rangos= new ArrayList<Ganador_Rangos>();
 	List<Ganador_Comunidad> comunidades= new ArrayList<>();
+	DefaultListModel modelo = new DefaultListModel();
 	Connection connection= null;
-	int totalVotantes= 0;
+	String comunidad= null;
+	String rango= null;
+	Integer posicion= null;
 	
 	public Controlador(Vista frame) {
 		vista= frame;
@@ -47,6 +52,11 @@ public class Controlador implements ActionListener{
 		this.vista.btnVotacionesComunidad.addActionListener(this);
 		this.vista.btnVotacionesNacionales.addActionListener(this);
 		this.vista.btnVotacionesRango.addActionListener(this);
+		this.vista.comboBox.addActionListener(this);
+		this.vista.comboBox_1.addActionListener(this);
+		this.vista.btnGanadoresComunidades.addActionListener(this);
+		this.vista.btnGanadoresRango.addActionListener(this);
+		this.vista.btnSacarCantante.addActionListener(this);
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -120,16 +130,82 @@ public class Controlador implements ActionListener{
 			}
 			
 			if (e.getSource()== vista.btnVotacionesComunidad) {
-				System.out.println("Boton ver votaciones Comunidad");
-				System.out.println(comunidades.get(0).getCantantes().get(0).getNombre());
+				this.vista.jPCantantes.setVisible(false);
+				this.vista.jPVerProbincia.setVisible(true);
 			}
 			
 			if (e.getSource()== vista.btnVotacionesNacionales) {
-				
+				this.vista.jPCantantes.setVisible(false);
+				this.vista.jPVerNacional.setVisible(true);
 			}
 			
 			if (e.getSource()== vista.btnVotacionesRango) {
+				this.vista.jPCantantes.setVisible(false);
+				this.vista.jPVerRango.setVisible(true);
+			}
+			
+			if (e.getSource()== vista.comboBox_1) {
+				comunidad= (String) this.vista.comboBox_1.getSelectedItem();
+				modelo.removeAllElements();
+				for (int i= 0; i< comunidades.size(); i++) {
+					if (comunidades.get(i).getComunidad().equals(comunidad)) {
+						for (int r= 0; r< comunidades.get(i).getCantantes().size(); r++) {
+							modelo.addElement(comunidades.get(i).getCantantes().get(r).toString());
+						}
+					}
+				}
+				this.vista.jLConcursantesComunidad.setModel(modelo);
+			}
+			
+			if (e.getSource()== vista.comboBox) {
+				rango= (String) this.vista.comboBox.getSelectedItem();
+				modelo.removeAllElements();
+				for (int i= 0; i< rangos.size(); i++) {
+					if (rangos.get(i).getRango().equals(rango)) {
+						for (int r= 0; r< rangos.get(i).getCantantes().size(); i++) {
+							modelo.addElement(rangos.get(i).getCantantes().get(r).toString());
+						}
+					}
+				}
+				this.vista.jLConcursantesRango.setModel(modelo);
+			}
+			
+			if (e.getSource()== vista.btnGanadoresComunidades) {
+				posicion= this.vista.jLConcursantesComunidad.getSelectedIndex();
 				
+				for (int i= 0; i< comunidades.size(); i++) {
+					if (comunidades.get(i).getComunidad().equals(comunidad)) {
+						this.vista.lblNombreCO.setText(comunidades.get(i).getCantantes().get(posicion).getNombre());
+						this.vista.lblApellidoCO.setText(comunidades.get(i).getCantantes().get(posicion).getApellidos());
+						this.vista.lblCanciónCO.setText(comunidades.get(i).getCantantes().get(posicion).getNombreCancion());
+						String puntos= String.valueOf(comunidades.get(i).getCantantes().get(posicion).getPuntos());
+						this.vista.lblApellidoCo.setText(puntos);
+					}
+				}
+			}
+			
+			if (e.getSource()== vista.btnGanadoresRango) {
+				posicion= this.vista.jLConcursantesRango.getSelectedIndex();
+				
+				for (int i= 0; i< rangos.size(); i++) {
+					if (rangos.get(i).getRango().equals(rango)) {
+						this.vista.lblNombreR.setText(rangos.get(i).getCantantes().get(posicion).getNombre());
+						this.vista.lblApellidoR.setText(rangos.get(i).getCantantes().get(posicion).getApellidos());
+						this.vista.lblCanciónR.setText(rangos.get(i).getCantantes().get(posicion).getNombreCancion());
+						String puntos= String.valueOf(rangos.get(i).getCantantes().get(posicion).getPuntos());
+						this.vista.lblApellidoR.setText(puntos);
+					}
+				}
+			}
+			
+			if (e.getSource()== vista.btnSacarCantante) {
+				posicion= this.vista.jListNacional.getSelectedIndex();
+				
+				this.vista.lblNombreN.setText(nacional.get(0).getCantantes().get(posicion).getNombre());
+				this.vista.lblApellidoN.setText(nacional.get(0).getCantantes().get(posicion).getApellidos());
+				this.vista.lblCancionN.setText(nacional.get(0).getCantantes().get(posicion).getNombreCancion());
+				String puntos= String.valueOf(nacional.get(0).getCantantes().get(posicion).getPuntos());
+				this.vista.lblApellidoN.setText(puntos);
 			}
 		} catch (Exception e1) {
 			e1.printStackTrace();
